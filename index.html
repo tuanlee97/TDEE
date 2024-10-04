@@ -3,177 +3,290 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tính Toán Macro Nutrition</title>
+    <title>TDEE & Macro Calculator</title>
     <style>
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        background-color: #f0f4f8;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
         color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
       }
+
+      h1 {
+        margin-bottom: 0px;
+      }
+
       .container {
+        background: #fff;
+        padding: 20px;
+
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
         width: 100%;
-        max-width: 600px;
-        background-color: #fff;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       }
-      input,
-      select {
-        width: 95%;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 6px;
-        border: 1px solid #ccc;
+
+      .form-group {
+        margin-bottom: 15px;
       }
-      button {
-        width: 100%;
-        background-color: #28a745;
-        color: white;
-        border: none;
-        padding: 12px 15px;
-        margin-top: 15px;
-        cursor: pointer;
-        border-radius: 6px;
-        font-size: 16px;
+
+      label {
+        display: block;
+        margin-bottom: 5px;
         font-weight: bold;
       }
-      button:hover {
-        background-color: #218838;
+
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
       }
-      #result {
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .results {
         margin-top: 20px;
       }
-      .activity-description {
+
+      .results p {
+        margin: 5px 0;
+      }
+
+      #chartContainer {
+        display: none;
+        margin-top: 30px;
+        width: 100%;
+        height: 400px;
+      }
+
+      .author {
         font-size: 14px;
-        color: #777;
+        margin-top: 10px;
+        margin-bottom: 30px;
+      }
+      .author span {
+        color: #007bff;
+        font-style: italic;
       }
     </style>
   </head>
   <body>
+    <h1>Công cụ tính TDEE & Macro</h1>
+    <p class="author">Developed by <span>#tuanlee</span></p>
     <div class="container">
-      <h2 style="text-align: center">Tính Toán Macro Nutrition</h2>
-      <label for="weight">Cân nặng (kg):</label>
-      <input type="number" id="weight" placeholder="Nhập cân nặng" required />
+      <div class="form-group">
+        <label for="weight">Cân nặng (kg):</label>
+        <input type="number" id="weight" placeholder="Nhập cân nặng" required />
+      </div>
 
-      <label for="bodyFat">Phần trăm mỡ cơ thể (%):</label>
-      <input
-        type="number"
-        id="bodyFat"
-        placeholder="Nhập % mỡ cơ thể"
-        required
-      />
+      <div class="form-group">
+        <label for="age">Tuổi:</label>
+        <input type="number" id="age" placeholder="Nhập tuổi" required />
+      </div>
 
-      <label for="activityLevel">Mức độ hoạt động:</label>
-      <select id="activityLevel">
-        <option value="1.2">Ít vận động - Hầu như không vận động</option>
-        <option value="1.375">
-          Vận động nhẹ - Tập thể dục nhẹ nhàng hoặc hoạt động 1-3 ngày/tuần
-        </option>
-        <option value="1.55">
-          Vận động vừa phải - Tập luyện vừa phải hoặc hoạt động 3-5 ngày/tuần
-        </option>
-        <option value="1.725">
-          Vận động nhiều - Tập luyện nặng hoặc hoạt động 6-7 ngày/tuần
-        </option>
-        <option value="1.9">
-          Vận động rất nhiều - Công việc đòi hỏi sức lực hoặc tập luyện rất gắt
-          gao
-        </option>
-      </select>
+      <div class="form-group">
+        <label for="gender">Giới tính:</label>
+        <select id="gender">
+          <option value="male">Nam</option>
+          <option value="female">Nữ</option>
+        </select>
+      </div>
 
-      <label for="goal">Mục tiêu:</label>
-      <select id="goal">
-        <option value="surplus">Tăng cân</option>
-        <option value="deficit">Giảm cân</option>
-        <option value="maintenance">Duy trì</option>
-      </select>
+      <div class="form-group">
+        <label for="bodyFat">Phần trăm mỡ cơ thể (%):</label>
+        <input
+          type="number"
+          id="bodyFat"
+          placeholder="Nhập % body fat"
+          required
+        />
+      </div>
 
-      <button onclick="calculate()">Tính Toán</button>
+      <div class="form-group">
+        <label for="activityLevel">Mức độ vận động:</label>
+        <select id="activityLevel">
+          <option value="1.2">Ít vận động (hầu như không tập thể dục)</option>
+          <option value="1.375">
+            Vận động nhẹ (tập thể dục nhẹ 1-3 ngày/tuần)
+          </option>
+          <option value="1.55">
+            Vận động vừa phải (tập thể dục vừa phải 3-5 ngày/tuần)
+          </option>
+          <option value="1.725">
+            Vận động nhiều (tập thể dục nặng 6-7 ngày/tuần)
+          </option>
+          <option value="1.9">
+            Rất năng động (tập thể dục rất nặng hoặc công việc thể lực)
+          </option>
+        </select>
+      </div>
 
-      <div id="result"></div>
+      <div class="form-group">
+        <label for="goal">Mục tiêu:</label>
+        <select id="goal">
+          <option value="surplus">Tăng cân</option>
+          <option value="deficit">Giảm cân</option>
+          <option value="maintenance">Giữ nguyên cân nặng</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="rate">Chọn tốc độ:</label>
+        <select id="rate">
+          <option value="fast">Nhanh (0.5 - 1 kg mỗi tuần)</option>
+          <option value="slow">Chậm (0.25 - 0.5 kg mỗi tuần)</option>
+        </select>
+      </div>
+
+      <button id="calculateBtn">Tính TDEE & Macro</button>
+
+      <div class="results" id="results"></div>
+
+      <div id="chartContainer">
+        <canvas id="macroChart"></canvas>
+      </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      function calculateMacros(weight, bodyFatPercentage, goal) {
-        const weightInLbs = weight * 2.20462; // Chuyển đổi kg sang lbs
-        const lbm = weightInLbs * (1 - bodyFatPercentage / 100);
+      document
+        .getElementById("calculateBtn")
+        .addEventListener("click", function () {
+          const weightKg = parseFloat(document.getElementById("weight").value);
+          const age = parseInt(document.getElementById("age").value);
+          const gender = document.getElementById("gender").value;
+          const bodyFat = parseFloat(document.getElementById("bodyFat").value);
+          const activityMultiplier = parseFloat(
+            document.getElementById("activityLevel").value
+          );
+          const goal = document.getElementById("goal").value;
+          const rate = document.getElementById("rate").value;
 
-        // Tính toán lượng protein dựa trên độ béo
-        let proteinMultiplier;
-        if (bodyFatPercentage < 15) {
-          proteinMultiplier = 1.6; // Leaner
-        } else if (bodyFatPercentage > 25) {
-          proteinMultiplier = 1.2; // Fattier
-        } else {
-          proteinMultiplier = 1.4; // Average
-        }
+          // Chuyển cân nặng sang lbs
+          const weightLbs = weightKg * 2.20462;
 
-        const proteinIntake = lbm * proteinMultiplier;
-        const fatPercentage = 0.25;
+          // Tính Lean Body Mass (LBM)
+          const leanMass = weightLbs * (1 - bodyFat / 100);
 
-        function calculateCalories(activityMultiplier) {
-          const bmr = weightInLbs * 10; // Basal Metabolic Rate (BMR) dựa trên cân nặng lbs
-          const maintenanceCalories = bmr * activityMultiplier;
-
-          let recompCalories;
-          if (goal === "surplus") {
-            recompCalories = maintenanceCalories + 250; // Caloric surplus
-          } else if (goal === "deficit") {
-            recompCalories = maintenanceCalories - 250; // Caloric deficit
+          // Tính BMR bằng công thức Mifflin St. Jeor
+          let BMR;
+          if (gender === "male") {
+            BMR = 10 * weightKg + 6.25 * 170 - 5 * age + 5;
           } else {
-            recompCalories = maintenanceCalories; // Maintenance
+            BMR = 10 * weightKg + 6.25 * 170 - 5 * age - 161;
           }
 
-          const fatIntake = (recompCalories * fatPercentage) / 9;
+          // Tính TDEE bằng cách nhân BMR với hệ số vận động
+          let TDEE = BMR * activityMultiplier;
 
-          const caloriesFromProtein = proteinIntake * 4;
-          const caloriesFromFat = fatIntake * 9;
-          const remainingCalories =
-            recompCalories - caloriesFromProtein - caloriesFromFat;
+          // Điều chỉnh TDEE theo mục tiêu và tốc độ
+          let adjustment = 0;
+          let rateDescription = "";
+          if (goal === "surplus") {
+            adjustment = rate === "fast" ? 500 : 300;
+            rateDescription =
+              rate === "fast"
+                ? "Tăng nhanh (0.5 - 1 kg mỗi tuần)"
+                : "Tăng chậm (0.25 - 0.5 kg mỗi tuần)";
+            TDEE += adjustment; // Tăng calo để tăng cân
+          } else if (goal === "deficit") {
+            adjustment = rate === "fast" ? -700 : -500;
+            rateDescription =
+              rate === "fast"
+                ? "Giảm nhanh (0.5 - 1 kg mỗi tuần)"
+                : "Giảm chậm (0.25 - 0.5 kg mỗi tuần)";
+            TDEE += adjustment; // Giảm calo để giảm cân
+          }
 
-          const carbIntake = remainingCalories / 4;
+          // Tính hệ số protein intake dynamic
+          let proteinFactor;
+          if (bodyFat <= 10) {
+            proteinFactor = 1.6; // Người rất gầy
+          } else if (bodyFat >= 30) {
+            proteinFactor = 1.2; // Người rất béo
+          } else {
+            // Nội suy giá trị giữa 1.2 và 1.6 dựa trên body fat
+            proteinFactor = 1.6 - ((bodyFat - 10) / 20) * (1.6 - 1.2);
+          }
 
-          return {
-            recompCalories: Math.round(recompCalories),
-            proteinIntake: Math.round(proteinIntake),
-            fatIntake: Math.round(fatIntake),
-            carbIntake: Math.round(carbIntake),
-          };
-        }
+          // Tính lượng protein intake
+          let proteinIntake = leanMass * proteinFactor;
 
-        return calculateCalories;
-      }
+          // Tính lượng chất béo (20-35% tổng calo, tùy vào body fat)
+          let fatPercentage = bodyFat > 20 ? 0.35 : 0.2;
+          let fatIntake = (TDEE * fatPercentage) / 9;
 
-      function calculate() {
-        const weight = parseFloat(document.getElementById("weight").value);
-        const bodyFat = parseFloat(document.getElementById("bodyFat").value);
-        const activityLevel = parseFloat(
-          document.getElementById("activityLevel").value
-        );
-        const goal = document.getElementById("goal").value;
+          // Tính lượng carb từ calo còn lại
+          let remainingCalories = TDEE - proteinIntake * 4 - fatIntake * 9;
+          let carbIntake = remainingCalories / 4;
 
-        if (!weight || !bodyFat) {
-          alert("Vui lòng nhập đầy đủ thông tin.");
-          return;
-        }
+          // Hiển thị kết quả
+          document.getElementById("results").innerHTML = `
+    <p>TDEE: ${TDEE.toFixed(2)} calo</p>
+    <p>Protein: ${proteinIntake.toFixed(2)} g (Hệ số: ${proteinFactor.toFixed(
+            2
+          )})</p>
+    <p>Fat: ${fatIntake.toFixed(2)} g</p>
+    <p>Carbs: ${carbIntake.toFixed(2)} g</p>
+    <p>Mục tiêu: ${rateDescription}</p>
+  `;
 
-        const calculateCalories = calculateMacros(weight, bodyFat, goal);
-        const macroResults = calculateCalories(activityLevel);
-
-        document.getElementById("result").innerHTML = `
-            <h3>Kết quả:</h3>
-            <p>Calories tổng cần: <strong>${macroResults.recompCalories}</strong> kcal/ngày</p>
-            <p>Protein cần: <strong>${macroResults.proteinIntake}</strong> g/ngày</p>
-            <p>Chất béo cần: <strong>${macroResults.fatIntake}</strong> g/ngày</p>
-            <p>Tinh bột cần: <strong>${macroResults.carbIntake}</strong> g/ngày</p>
-        `;
-      }
+          // Biểu đồ macros
+          const ctx = document.getElementById("macroChart").getContext("2d");
+          const macroChart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: ["Protein (g)", "Fat (g)", "Carbs (g)"],
+              datasets: [
+                {
+                  label: "Macros",
+                  data: [
+                    proteinIntake.toFixed(2),
+                    fatIntake.toFixed(2),
+                    carbIntake.toFixed(2),
+                  ],
+                  backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+                  hoverOffset: 4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: "top",
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (tooltipItem) {
+                      return `${tooltipItem.label}: ${tooltipItem.raw} g`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+          document.getElementById("chartContainer").style.display = "block";
+        });
     </script>
   </body>
 </html>
